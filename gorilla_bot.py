@@ -4,16 +4,62 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 import time
 from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.chrome.service import Service
+
+"""
+===============================================================================
+gorilla_bot.py
+
+Automates the process of logging into the Gorilla.sc platform and downloading 
+experiment data for a specific project.
+
+Functionality:
+- Reads Gorilla login credentials from local text files.
+- Launches a Chrome browser instance using Selenium and WebDriverManager.
+- Logs into the Gorilla admin portal.
+- Navigates to a specific experiment's data page.
+- Regenerates the dataset (to include new submissions).
+- Waits for the regeneration process to complete.
+- Initiates and downloads the most recent data as a .zip file.
+
+Key Notes:
+- Designed for use on Windows and Linux (adjusts file paths accordingly).
+- The downloaded file is expected to appear in the user's Downloads folder.
+- Uses a while loop to ensure the download button is available before proceeding.
+- Sleeps are used for timing and can be adjusted depending on network speed and
+  Gorilla server responsiveness.
+
+Dependencies:
+- selenium
+- webdriver-manager
+
+To run:
+- Ensure Chrome is installed and compatible with ChromeDriverManager.
+- Place credential text files (`carter_gorilla_email.txt`, `carter_gorilla_password.txt`) 
+  in the specified directory (`L:/rsmith/wellbeing/tasks/QC/getting_gorilla_data/`).
+
+===============================================================================
+"""
+
 
 def run_bot():
     # get carter's username and password for gorilla
-    with open('carter_gorilla_email.txt', 'r') as file:
+    with open('L:/rsmith/wellbeing/tasks/QC/getting_gorilla_data/carter_gorilla_email.txt', 'r') as file:
         carter_gorilla_email = file.read().strip()
-    with open('carter_gorilla_password.txt', 'r') as file:
+    with open('L:/rsmith/wellbeing/tasks/QC/getting_gorilla_data/carter_gorilla_password.txt', 'r') as file:
         carter_gorilla_pass = file.read().strip()        
     
     # Initialize the driver
-    driver = webdriver.Chrome(ChromeDriverManager().install())
+    #driver = webdriver.Chrome(ChromeDriverManager().install())
+
+    driver_path = ChromeDriverManager().install()
+    if driver_path:
+        driver_name = driver_path.split('/')[-1]
+        # due to a chrome update, ChromeDriverManager().Install() returns a third party binaries file that we don't need. Change the file path before calling driver.
+        if driver_name!="chromedriver":
+            driver_path = "/".join(driver_path.split('/')[:-1]+["chromedriver"])
+            #os.chmod(driver_path, 0o755) change permissions of file specified by driver_path
+    driver = webdriver.Chrome(service=Service(driver_path))
 
 
     # Navigate to the website
@@ -54,7 +100,7 @@ def run_bot():
             data_button = driver.find_element(By.ID, "data-button")
             # open the data download popup
             data_button.click()
-            time.sleep(8)
+            time.sleep(15)
             # Try to find the download button
             download_button = driver.find_element(By.CLASS_NAME, "button-download")
             # If the button is found, you can perform actions on it
@@ -66,8 +112,9 @@ def run_bot():
             time.sleep(20)
 
     download_button.click()
-    time.sleep(500)
+    time.sleep(900)
     # # Close the driver
     # driver.quit()
     driver.quit()
 
+# run_bot()

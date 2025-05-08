@@ -1,10 +1,39 @@
 import time,os,zipfile
 import pandas as pd
 import math
-# unzip and process downloaded gorilla files
-# retrieve zip file from downloads
-# MAKE SURE NO OUTPUT FILES ARE OPEN WHEN YOU RUN
-# note that will have to change v5 to v6 in file = pd.read_csv(f'{unzipped_dir}/data_exp_169510-v5_questionnaire-qoiw.csv') and x.__contains__("v5_task"): if aardron updates verison
+"""
+===============================================================================
+unzip_and_process.py
+
+This script performs automated unzipping and renaming of behavioral data files 
+downloaded from Gorilla for the Theory of Mind (TOM) task.
+
+Functionality:
+- Scans the user's Downloads directory for the most recent Gorilla data zip file 
+  that matches a specific naming pattern (e.g., "data_exp_169510").
+- Unzips the file to a target directory.
+- Parses the associated questionnaire file to build a mapping between private 
+  participant IDs and Prolific IDs.
+- Iterates through the task data files, filters and extracts data by participant, 
+  and renames them using the Prolific ID, session date, and task node.
+- Saves the renamed files to a standardized directory:
+    L:/NPC/DataSink/StimTool_Online/WB_Theory_Of_Mind/
+
+Assumptions:
+- Data files follow Gorilla v5 naming conventions (e.g., "v5_task").
+- Questionnaire file must be present in the zip and include the relevant ID mapping.
+- Script should be run with all output files closed, or the write step will fail.
+
+Notes:
+- This script will need to be updated if Gorilla changes experiment version numbers 
+  (e.g., v6), or if the file naming scheme changes.
+
+Usage:
+- Import and call `process_zipped_files()` in another script (e.g., main_gorilla_bot_process.py),
+  or uncomment the final line to run standalone.
+
+===============================================================================
+"""
 
 def process_zipped_files():
     current_time = time.time()
@@ -12,7 +41,7 @@ def process_zipped_files():
     # Initialize the most recent file and its modification time
     most_recent_file = None
     most_recent_time = 0
-    folder_path = "C:\\Users\\CGoldman\\Downloads\\"
+    folder_path = os.path.join(os.getenv('USERPROFILE'), 'Downloads') + "\\"
     # Walk through the directory to get most recent zip file
     for filename in os.listdir(folder_path):
         # Check if the file ends with .zip and contains the specific string
@@ -92,7 +121,7 @@ def process_zipped_files():
                 #         file.to_csv(new_file_path, index=False)
 
 
-process_zipped_files()
+# process_zipped_files()
 
 
             
